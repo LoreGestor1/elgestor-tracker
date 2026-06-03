@@ -224,13 +224,40 @@ body{font-family:var(--font-sans,'system-ui');background:#f0f3fa;min-height:100v
 </div>
 </div>
 
+<!-- PANTALLA 1B: SELECTOR DE ALIADO -->
+<div class="screen" id="screen-sel-aliado">
+<div class="login-wrap">
+  <div class="login-logo">
+    <svg width="56" height="56" viewBox="0 0 80 80">
+      <polygon points="40,4 68,20 40,36 12,20" fill="#7dc242"/>
+      <polygon points="40,36 68,20 68,52 40,68" fill="#3a6fba"/>
+      <polygon points="12,20 40,36 40,68 12,52" fill="#3aaa8c"/>
+      <polygon points="40,22 52,29 52,43 40,50 28,43 28,29" fill="#1a2a5e" opacity=".8"/>
+    </svg>
+    <div class="login-brand">EL GESTOR</div>
+    <div class="login-sub">TRACKER COMERCIAL</div>
+  </div>
+  <div class="login-title">¿Quién eres?</div>
+  <div style="width:100%;max-width:320px">
+    <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:16px;padding:16px;margin-bottom:12px">
+      <div style="position:relative;margin-bottom:10px">
+        <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.4);font-size:15px">🔍</span>
+        <input id="buscar-aliado" type="text" placeholder="Buscar aliado..." oninput="filtrarAliados()" style="width:100%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:10px;padding:8px 10px 8px 32px;font-size:13px;color:white;outline:none"/>
+      </div>
+      <div id="lista-aliados" style="display:flex;flex-direction:column;gap:5px;max-height:340px;overflow-y:auto"></div>
+    </div>
+    <div style="text-align:center;padding:10px;border-radius:12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);cursor:pointer;color:rgba(255,255,255,.7);font-size:12px" onclick="goLogin()">← Volver</div>
+  </div>
+</div>
+</div>
+
 <!-- PANTALLA 2: ALIADO -->
 <div class="screen" id="screen-aliado">
 <div class="app-header">
   <div class="ah-top">
     <div class="ah-brand">
       <svg width="30" height="30" viewBox="0 0 80 80"><polygon points="40,4 68,20 40,36 12,20" fill="#7dc242"/><polygon points="40,36 68,20 68,52 40,68" fill="#3a6fba"/><polygon points="12,20 40,36 40,68 12,52" fill="#3aaa8c"/></svg>
-      <div><div class="ah-title">EL GESTOR</div><div class="ah-sub">TRACKER COMERCIAL</div></div>
+      <div><div class="ah-title">EL GESTOR</div><div class="ah-sub" id="ah-aliado-name">TRACKER COMERCIAL</div></div>
     </div>
     <div class="back-pill" onclick="goLogin()">← Cambiar</div>
   </div>
@@ -391,8 +418,32 @@ function enterCoach(){
   renderCoach();
 }
 function enterAliado(){
-  // For demo: pick first aliado
-  currentAliado=ALIADOS_LISTA[0];
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-sel-aliado').classList.add('active');
+  document.getElementById('buscar-aliado').value='';
+  renderListaAliados(ALIADOS_LISTA);
+}
+function renderListaAliados(lista){
+  document.getElementById('lista-aliados').innerHTML=lista.map(n=>{
+    const initials=n.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+    const colors=['#7dc242','#3aaa8c','#3a6fba','#f59e0b','#ef4444','#8b5cf6'];
+    const color=colors[ALIADOS_LISTA.indexOf(n)%colors.length];
+    return`<div onclick="seleccionarAliado('${n}')" style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;cursor:pointer;transition:all .15s;border:1px solid rgba(255,255,255,.1)" onmouseover="this.style.background='rgba(255,255,255,.12)'" onmouseout="this.style.background='transparent'">
+      <div style="width:38px;height:38px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:white;flex-shrink:0">${initials}</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:500;color:white">${n}</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:1px">Aliado comercial</div>
+      </div>
+      <span style="color:rgba(255,255,255,.3);font-size:16px">›</span>
+    </div>`;
+  }).join('')||`<div style="text-align:center;color:rgba(255,255,255,.4);font-size:12px;padding:16px">No se encontraron resultados</div>`;
+}
+function filtrarAliados(){
+  const q=document.getElementById('buscar-aliado').value.toLowerCase();
+  renderListaAliados(ALIADOS_LISTA.filter(n=>n.toLowerCase().includes(q)));
+}
+function seleccionarAliado(nombre){
+  currentAliado=nombre;
   const reg=getRegistros(currentAliado);
   todayC=reg[TK]?{...reg[TK].counts}:{};
   ibcVal=reg[TK]?reg[TK].ibc||0:0;
@@ -453,6 +504,7 @@ function saveMetas(){
 function initAliado(){
   const d=today;
   document.getElementById('hh-date').textContent=DAYS_ES[d.getDay()]+' '+d.getDate()+' de '+MONTHS_ES[d.getMonth()]+' '+d.getFullYear();
+  document.getElementById('ah-aliado-name').textContent=currentAliado.split(' ')[0].toUpperCase();
   if(document.getElementById('ibc-input')) document.getElementById('ibc-input').value=ibcVal||'';
   renderActList();
   updatePlanStrip();
