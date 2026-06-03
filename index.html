@@ -1,0 +1,616 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>El Gestor — Tracker Comercial</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--navy:#1a2a5e;--green:#7dc242;--teal:#3aaa8c;--blue:#3a6fba;--amber:#f59e0b;--red:#ef4444}
+body{font-family:var(--font-sans,'system-ui');background:#f0f3fa;min-height:100vh}
+.screen{display:none}.screen.active{display:block}
+
+/* LOGIN SELECTOR */
+.login-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;background:linear-gradient(160deg,#1a2a5e 0%,#243474 60%,#1d3a6e 100%)}
+.login-logo{margin-bottom:24px;text-align:center}
+.login-brand{font-size:22px;font-weight:500;color:white;letter-spacing:2px;margin-top:8px}
+.login-sub{font-size:12px;color:rgba(255,255,255,.5);letter-spacing:.5px}
+.login-title{font-size:16px;color:rgba(255,255,255,.8);margin-bottom:20px;text-align:center}
+.login-cards{display:flex;flex-direction:column;gap:10px;width:100%;max-width:320px}
+.login-card{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:16px;padding:18px 16px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:14px}
+.login-card:active{transform:scale(.98)}
+.login-card:hover{background:rgba(255,255,255,.13)}
+.lc-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.lc-title{font-size:14px;font-weight:500;color:white}
+.lc-sub{font-size:11px;color:rgba(255,255,255,.5);margin-top:2px}
+.plan-badge{background:rgba(125,194,66,.15);border:1px solid rgba(125,194,66,.3);border-radius:20px;padding:6px 14px;color:#9fd660;font-size:11px;font-weight:500;text-align:center;margin-top:16px}
+
+/* COACH SCREEN */
+.coach-header{background:var(--navy);padding:14px 14px 12px}
+.ch-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:0}
+.ch-brand{display:flex;align-items:center;gap:8px}
+.ch-title{font-size:13px;font-weight:500;color:white;letter-spacing:.5px}
+.ch-sub{font-size:9px;color:rgba(255,255,255,.5)}
+.back-pill{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:4px 10px;font-size:10px;color:rgba(255,255,255,.8);cursor:pointer}
+.coach-content{padding:12px}
+.coach-aliado-sel{background:white;border-radius:12px;border:.5px solid #e2e8f0;padding:12px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.cas-label{font-size:11px;color:#64748b;margin-bottom:6px;font-weight:500}
+.aliado-chips{display:flex;flex-wrap:wrap;gap:6px}
+.achip{padding:5px 12px;border-radius:20px;border:.5px solid #cbd5e1;background:#f8fafc;font-size:11px;color:#475569;cursor:pointer;transition:all .15s;font-weight:500}
+.achip.sel{background:var(--navy);color:white;border-color:var(--navy)}
+.metas-form{background:white;border-radius:12px;border:.5px solid #e2e8f0;padding:12px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.mf-title{font-size:13px;font-weight:500;color:var(--navy);margin-bottom:4px}
+.mf-sub{font-size:11px;color:#64748b;margin-bottom:12px}
+.plan-tabs{display:flex;gap:6px;margin-bottom:12px}
+.ptab{flex:1;padding:6px;border-radius:8px;border:.5px solid #cbd5e1;background:#f8fafc;font-size:11px;color:#475569;cursor:pointer;text-align:center;font-weight:500;transition:all .15s}
+.ptab.on{background:var(--navy);color:white;border-color:var(--navy)}
+.meta-rows{display:flex;flex-direction:column;gap:8px}
+.meta-row{display:grid;grid-template-columns:1fr 60px 60px 60px;gap:6px;align-items:center}
+.mr-label{font-size:11px;color:var(--navy);font-weight:500;line-height:1.3}
+.mr-input{width:100%;padding:6px 4px;border-radius:7px;border:.5px solid #cbd5e1;font-size:12px;color:var(--navy);background:#f8fafc;text-align:center}
+.mr-input:focus{outline:none;border-color:var(--teal);background:white}
+.col-hdr{font-size:9px;color:#94a3b8;text-align:center;font-weight:500}
+.ibc-row-coach{display:grid;grid-template-columns:1fr 100px 100px 100px;gap:6px;align-items:center;padding-top:8px;border-top:.5px solid #f1f5f9;margin-top:4px}
+.save-metas-btn{width:100%;padding:12px;background:var(--navy);color:white;border:none;border-radius:11px;font-size:13px;font-weight:500;cursor:pointer;margin-top:12px;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .2s}
+.save-metas-btn:active{transform:scale(.98)}
+.save-metas-btn.ok{background:var(--teal)}
+
+/* ALIADO SCREEN */
+.app-header{background:var(--navy);padding:14px 14px 0}
+.ah-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.ah-brand{display:flex;align-items:center;gap:8px}
+.ah-title{font-size:13px;font-weight:500;color:white;letter-spacing:.5px}
+.ah-sub{font-size:9px;color:rgba(255,255,255,.5)}
+.plan-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:0 0 14px}
+.ps-card{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:8px;text-align:center}
+.ps-period{font-size:9px;color:rgba(255,255,255,.5);margin-bottom:3px;font-weight:500;text-transform:uppercase;letter-spacing:.5px}
+.ps-pct{font-size:20px;font-weight:500}
+.ps-label{font-size:9px;color:rgba(255,255,255,.5);margin-top:1px}
+.nav{display:flex;background:white;border-bottom:.5px solid #e2e8f0;position:sticky;top:0;z-index:10;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.nb{flex:1;padding:9px 2px 7px;background:none;border:none;cursor:pointer;font-size:10px;color:#94a3b8;display:flex;flex-direction:column;align-items:center;gap:2px;border-bottom:2.5px solid transparent;transition:all .2s}
+.nb.active{color:var(--navy);border-bottom-color:var(--green)}
+.nb i{font-size:17px}
+.content{padding:12px}
+
+/* HOY tab */
+.hoy-hero{background:white;border-radius:14px;border:.5px solid #e2e8f0;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.hh-date{font-size:15px;font-weight:500;color:var(--navy);margin-bottom:2px}
+.hh-sub{font-size:11px;color:#64748b;margin-bottom:12px}
+.hh-progress{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.hh-p{text-align:center;padding:8px 4px;background:#f8fafc;border-radius:10px}
+.hh-pv{font-size:17px;font-weight:500}
+.hh-pl{font-size:9px;color:#64748b;margin-top:1px}
+.act-list{display:flex;flex-direction:column;gap:7px}
+.arow{background:white;border-radius:12px;border:.5px solid #e2e8f0;padding:10px 11px;display:flex;align-items:center;gap:9px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.arow.done-today{border-color:#7dc242;background:#fafffe}
+.aicon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ainfo{flex:1;min-width:0}
+.aname{font-size:12px;font-weight:500;color:var(--navy);line-height:1.2}
+.ameta-line{display:flex;gap:8px;margin-top:3px;flex-wrap:wrap}
+.ameta-chip{font-size:9px;padding:1px 7px;border-radius:8px;font-weight:500}
+.hoy-chip{background:#e8f5d9;color:#3d7a0e}
+.sem-chip{background:#e4edf8;color:#1a2a5e}
+.mes-chip{background:#fef3c7;color:#92400e}
+.amini{height:3px;background:#f1f5f9;border-radius:2px;margin-top:5px;overflow:hidden}
+.amini-f{height:100%;border-radius:2px;transition:width .5s}
+.ctr{display:flex;align-items:center;gap:5px;flex-shrink:0}
+.bm,.bp{width:28px;height:28px;border-radius:7px;border:.5px solid #cbd5e1;background:#f8fafc;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;color:#334155;transition:all .15s;-webkit-tap-highlight-color:transparent;user-select:none}
+.bp{background:var(--navy);border-color:var(--navy);color:white}
+.bm:active,.bp:active{transform:scale(.85)}
+.cv{font-size:16px;font-weight:500;color:var(--navy);min-width:22px;text-align:center}
+.ibc-card{background:white;border-radius:12px;border:.5px solid #e2e8f0;padding:11px 12px;margin-top:7px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.ibc-label{font-size:12px;font-weight:500;color:var(--navy);margin-bottom:7px;display:flex;align-items:center;gap:6px}
+.ibc-input{width:100%;padding:8px 10px;border-radius:8px;border:.5px solid #cbd5e1;font-size:14px;color:var(--navy);background:#f8fafc}
+.ibc-input:focus{outline:none;border-color:var(--teal)}
+.ibc-metas{display:flex;gap:6px;margin-top:6px}
+.ibc-m{flex:1;text-align:center;font-size:9px;color:#64748b;background:#f8fafc;border-radius:7px;padding:4px}
+.ibc-mv{font-size:11px;font-weight:500;color:var(--navy)}
+.save-btn{width:100%;padding:13px;background:var(--navy);color:white;border:none;border-radius:12px;font-size:14px;font-weight:500;cursor:pointer;margin-top:12px;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .2s}
+.save-btn:active{transform:scale(.98)}
+.save-btn.ok{background:var(--teal)}
+
+/* METAS tab */
+.metas-view{display:flex;flex-direction:column;gap:8px}
+.mv-card{background:white;border-radius:13px;border:.5px solid #e2e8f0;padding:12px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.mv-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.mv-name{font-size:12px;font-weight:500;color:var(--navy);display:flex;align-items:center;gap:6px}
+.mv-pct{font-size:14px;font-weight:500}
+.mv-periods{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.mv-p{border-radius:8px;padding:7px 6px;text-align:center}
+.mv-pv{font-size:15px;font-weight:500}
+.mv-pl{font-size:9px;margin-top:1px;opacity:.7}
+.mv-track{height:5px;background:#f1f5f9;border-radius:3px;margin-top:8px;overflow:hidden}
+.mv-fill{height:100%;border-radius:3px;transition:width .8s}
+
+/* SEMANA tab */
+.sr-row{display:flex;gap:7px;margin-bottom:11px}
+.sc{flex:1;background:white;border-radius:11px;border:.5px solid #e2e8f0;padding:10px;text-align:center}
+.scv{font-size:20px;font-weight:500;color:var(--navy)}
+.scl{font-size:10px;color:#64748b;margin-top:1px}
+.drow{display:flex;gap:4px;margin-bottom:12px}
+.dd{flex:1;border-radius:4px;overflow:hidden}
+.dd-top{height:6px;background:#e2e8f0;border-radius:3px}
+.dd-top.dn{background:var(--teal)}.dd-top.dt{background:var(--green)}
+.dd-lbl{font-size:9px;color:#94a3b8;text-align:center;margin-top:3px}
+.wkcard{background:white;border-radius:12px;border:.5px solid #e2e8f0;padding:11px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.wkh{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.wko{font-size:12px;font-weight:500;color:var(--navy)}
+.wkrow{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+.wklbl{font-size:10px;color:#64748b;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wkbar{flex:1;height:4px;background:#f1f5f9;border-radius:2px;overflow:hidden}
+.wkval{font-size:9px;color:#94a3b8;min-width:38px;text-align:right}
+.sect{font-size:11px;font-weight:500;color:#94a3b8;text-transform:uppercase;letter-spacing:.7px;margin:4px 0 10px}
+.hidden{display:none}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--navy);color:white;padding:9px 16px;border-radius:20px;font-size:12px;font-weight:500;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+.celebration{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(26,42,94,.85);z-index:200;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+.celebration.show{display:flex}
+.cel-icon{font-size:64px}
+.cel-title{font-size:20px;font-weight:500;color:white;text-align:center}
+.cel-sub{font-size:13px;color:rgba(255,255,255,.7);text-align:center}
+.cel-btn{background:var(--green);color:white;border:none;border-radius:12px;padding:12px 28px;font-size:14px;font-weight:500;cursor:pointer;margin-top:8px}
+</style>
+</head>
+<body>
+
+<!-- PANTALLA 0: SELECTOR -->
+<div class="screen active" id="screen-login">
+<div class="login-wrap">
+  <div class="login-logo">
+    <svg width="64" height="64" viewBox="0 0 80 80">
+      <polygon points="40,4 68,20 40,36 12,20" fill="#7dc242"/>
+      <polygon points="40,36 68,20 68,52 40,68" fill="#3a6fba"/>
+      <polygon points="12,20 40,36 40,68 12,52" fill="#3aaa8c"/>
+      <polygon points="40,22 52,29 52,43 40,50 28,43 28,29" fill="#1a2a5e" opacity=".8"/>
+    </svg>
+    <div class="login-brand">EL GESTOR</div>
+    <div class="login-sub">TRACKER COMERCIAL</div>
+  </div>
+  <div class="login-title">¿Cómo quieres ingresar?</div>
+  <div class="login-cards">
+    <div class="login-card" onclick="enterCoach()">
+      <div class="lc-icon" style="background:rgba(125,194,66,.15)"><i class="ti ti-settings" style="color:#7dc242;font-size:22px"></i></div>
+      <div>
+        <div class="lc-title">Coach / Coordinación</div>
+        <div class="lc-sub">Configurar metas por aliado · Ver consolidado</div>
+      </div>
+    </div>
+    <div class="login-card" onclick="enterAliado()">
+      <div class="lc-icon" style="background:rgba(58,170,140,.15)"><i class="ti ti-user" style="color:#3aaa8c;font-size:22px"></i></div>
+      <div>
+        <div class="lc-title">Aliado</div>
+        <div class="lc-sub">Registrar actividades · Ver mi progreso</div>
+      </div>
+    </div>
+  </div>
+  <div class="plan-badge">📅 Plan 3 meses · 12 semanas · 90 días</div>
+</div>
+</div>
+
+<!-- PANTALLA 1: COACH -->
+<div class="screen" id="screen-coach">
+<div class="coach-header">
+  <div class="ch-top">
+    <div class="ch-brand">
+      <svg width="30" height="30" viewBox="0 0 80 80"><polygon points="40,4 68,20 40,36 12,20" fill="#7dc242"/><polygon points="40,36 68,20 68,52 40,68" fill="#3a6fba"/><polygon points="12,20 40,36 40,68 12,52" fill="#3aaa8c"/></svg>
+      <div><div class="ch-title">EL GESTOR · COACH</div><div class="ch-sub">Configuración de metas por aliado</div></div>
+    </div>
+    <div class="back-pill" onclick="goLogin()">← Salir</div>
+  </div>
+</div>
+<div class="coach-content">
+  <div class="coach-aliado-sel">
+    <div class="cas-label">Selecciona el aliado</div>
+    <div class="aliado-chips" id="aliado-chips"></div>
+  </div>
+  <div class="metas-form" id="metas-form">
+    <div class="mf-title" id="mf-title">Metas — <span id="mf-name">selecciona un aliado</span></div>
+    <div class="mf-sub">Plan 3/12/90 · Define las metas para cada indicador</div>
+    <div class="plan-tabs">
+      <div class="ptab on" onclick="setPlanTab('mes')">📅 Mensual</div>
+      <div class="ptab" onclick="setPlanTab('sem')">📆 Semanal</div>
+      <div class="ptab" onclick="setPlanTab('dia')">☀️ Diaria</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 80px;gap:6px;margin-bottom:6px;padding:0 2px">
+      <div class="col-hdr" style="text-align:left">Indicador</div>
+      <div class="col-hdr" id="col-hdr-val">Meta / mes</div>
+    </div>
+    <div class="meta-rows" id="meta-rows"></div>
+    <button class="save-metas-btn" id="save-metas-btn" onclick="saveMetas()">
+      <i class="ti ti-device-floppy"></i> Guardar metas del aliado
+    </button>
+  </div>
+</div>
+</div>
+
+<!-- PANTALLA 2: ALIADO -->
+<div class="screen" id="screen-aliado">
+<div class="app-header">
+  <div class="ah-top">
+    <div class="ah-brand">
+      <svg width="30" height="30" viewBox="0 0 80 80"><polygon points="40,4 68,20 40,36 12,20" fill="#7dc242"/><polygon points="40,36 68,20 68,52 40,68" fill="#3a6fba"/><polygon points="12,20 40,36 40,68 12,52" fill="#3aaa8c"/></svg>
+      <div><div class="ah-title">EL GESTOR</div><div class="ah-sub">TRACKER COMERCIAL</div></div>
+    </div>
+    <div class="back-pill" onclick="goLogin()">← Cambiar</div>
+  </div>
+  <!-- Plan 3/12/90 strip -->
+  <div class="plan-strip" id="plan-strip">
+    <div class="ps-card"><div class="ps-period">3 meses</div><div class="ps-pct" id="ps-3m" style="color:#7dc242">0%</div><div class="ps-label">trimestre</div></div>
+    <div class="ps-card"><div class="ps-period">12 semanas</div><div class="ps-pct" id="ps-12s" style="color:#3aaa8c">0%</div><div class="ps-label">esta semana</div></div>
+    <div class="ps-card"><div class="ps-period">90 días</div><div class="ps-pct" id="ps-90d" style="color:#f5c842">0%</div><div class="ps-label">hoy</div></div>
+  </div>
+</div>
+<nav class="nav">
+  <button class="nb active" onclick="showTab('hoy')" id="tab-hoy"><i class="ti ti-circle-check"></i>Hoy</button>
+  <button class="nb" onclick="showTab('metas')" id="tab-metas"><i class="ti ti-target"></i>Mis Metas</button>
+  <button class="nb" onclick="showTab('semana')" id="tab-semana"><i class="ti ti-calendar-week"></i>Semana</button>
+</nav>
+<div class="content">
+
+<!-- HOY -->
+<div id="tc-hoy">
+  <div class="hoy-hero">
+    <div class="hh-date" id="hh-date">Miércoles 28 de mayo</div>
+    <div class="hh-sub">Registra cada actividad completada hoy</div>
+    <div class="hh-progress">
+      <div class="hh-p"><div class="hh-pv" id="hh-hoy" style="color:var(--navy)">0%</div><div class="hh-pl">☀️ Hoy</div></div>
+      <div class="hh-p"><div class="hh-pv" id="hh-sem" style="color:var(--teal)">0%</div><div class="hh-pl">📆 Semana</div></div>
+      <div class="hh-p"><div class="hh-pv" id="hh-mes" style="color:var(--green)">0%</div><div class="hh-pl">📅 Mes</div></div>
+    </div>
+  </div>
+  <div class="act-list" id="act-list"></div>
+  <div class="ibc-card">
+    <div class="ibc-label"><i class="ti ti-currency-dollar" style="font-size:16px;color:#3d7a0e"></i> Valor Comisiones IBC hoy</div>
+    <input class="ibc-input" type="number" id="ibc-input" placeholder="$0" step="100000" oninput="updateIBC()"/>
+    <div class="ibc-metas" id="ibc-metas"></div>
+  </div>
+  <button class="save-btn" id="save-btn" onclick="saveDay()">
+    <i class="ti ti-device-floppy"></i> Guardar mi día
+  </button>
+</div>
+
+<!-- MIS METAS -->
+<div id="tc-metas" class="hidden">
+  <div class="sect">Mi plan 3 / 12 / 90</div>
+  <div class="metas-view" id="metas-view"></div>
+</div>
+
+<!-- SEMANA -->
+<div id="tc-semana" class="hidden">
+  <div class="sect">Esta semana</div>
+  <div class="sr-row">
+    <div class="sc"><div class="scv" id="s-days">0</div><div class="scl">días activos</div></div>
+    <div class="sc"><div class="scv" id="s-pct">0%</div><div class="scl">vs meta sem.</div></div>
+    <div class="sc"><div class="scv" id="s-pts">0</div><div class="scl">actividades</div></div>
+  </div>
+  <div class="drow" id="drow"></div>
+  <div id="wk-groups"></div>
+</div>
+
+</div>
+</div>
+
+<!-- CELEBRATION -->
+<div class="celebration" id="celebration">
+  <div class="cel-icon">🏆</div>
+  <div class="cel-title" id="cel-title">¡Meta cumplida!</div>
+  <div class="cel-sub" id="cel-sub">Sigue así, ¡eres imparable!</div>
+  <button class="cel-btn" onclick="closeCel()">¡Continuar!</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const ACTS=[
+  {id:'llamadas_exp',   label:'Llamadas Exploración',      icon:'ti-phone-outgoing', bg:'#e0f5ef',ic:'#0F6E56'},
+  {id:'llamadas_leads', label:'Llamadas Leads Campañas',   icon:'ti-phone-call',     bg:'#e4edf8',ic:'#185FA5'},
+  {id:'crm',           label:'Contactos CRM',              icon:'ti-address-book',   bg:'#e8f5d9',ic:'#3d7a0e'},
+  {id:'citas_cap_arr', label:'Citas Captación Arriendos',  icon:'ti-home-plus',      bg:'#e0f5ef',ic:'#0F6E56'},
+  {id:'citas_cap_vta', label:'Citas Captación Ventas',     icon:'ti-building-store', bg:'#fef3c7',ic:'#92400e'},
+  {id:'cap_arr',       label:'Captaciones Arriendo',       icon:'ti-key',            bg:'#e4edf8',ic:'#1a2a5e'},
+  {id:'cap_vta',       label:'Captaciones Ventas',         icon:'ti-home-dollar',    bg:'#fbeaf0',ic:'#993556'},
+  {id:'citas_arr',     label:'Citas Arrendatarios',        icon:'ti-user-heart',     bg:'#e0f5ef',ic:'#3aaa8c'},
+  {id:'citas_comp',    label:'Citas Compradores',          icon:'ti-users',          bg:'#eeedfe',ic:'#534AB7'},
+  {id:'contratos',     label:'Contratos Firmados Arriendo',icon:'ti-file-certificate',bg:'#e8f5d9',ic:'#3d7a0e'},
+  {id:'cierres',       label:'Cierres Venta',              icon:'ti-rosette',        bg:'#faeeda',ic:'#854F0B'},
+];
+const GROUPS=[
+  {label:'Prospección',  icon:'ti-phone',  acts:['llamadas_exp','llamadas_leads','crm']},
+  {label:'Captación',    icon:'ti-key',    acts:['citas_cap_arr','citas_cap_vta','cap_arr','cap_vta']},
+  {label:'Gestión',      icon:'ti-users',  acts:['citas_arr','citas_comp']},
+  {label:'Resultados',   icon:'ti-rosette',acts:['contratos','cierres']},
+];
+const DEFAULT_METAS={llamadas_exp:{mes:20,sem:5,dia:1},llamadas_leads:{mes:60,sem:15,dia:3},crm:{mes:60,sem:15,dia:3},citas_cap_arr:{mes:12,sem:3,dia:1},citas_cap_vta:{mes:6,sem:2,dia:0},cap_arr:{mes:12,sem:3,dia:1},cap_vta:{mes:4,sem:1,dia:0},citas_arr:{mes:13,sem:3,dia:1},citas_comp:{mes:7,sem:2,dia:0},contratos:{mes:4,sem:1,dia:0},cierres:{mes:1,sem:0,dia:0}};
+const DEFAULT_IBC={mes:6000000,sem:1500000,dia:300000};
+const ALIADOS_LISTA=['Ruby Morales','Carlos Pérez','Ana Lucía Torres','Jhon Castaño','Marcela Ríos','Diego Salazar','Patricia Gómez','Luis Hernández','Sandra Ospina','Mauricio Betancur','Claudia Vega','Andrés Muñoz','Gloria Ramírez','Felipe Duarte'];
+const DAYS_ES=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+const MONTHS_ES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+
+// STATE
+let store={};
+try{store=JSON.parse(localStorage.getItem('eg_v4')||'{}')}catch(e){}
+const today=new Date();
+const TK=today.toISOString().split('T')[0];
+let currentAliado=ALIADOS_LISTA[0];
+let coachAliado=ALIADOS_LISTA[0];
+let planTab='mes';
+let todayC={};
+let ibcVal=0;
+
+function getAliadoData(nombre){
+  if(!store[nombre]) store[nombre]={metas:{...DEFAULT_METAS},ibc_metas:{...DEFAULT_IBC},registros:{}};
+  return store[nombre];
+}
+function getMetas(nombre){return getAliadoData(nombre).metas}
+function getIbcMetas(nombre){return getAliadoData(nombre).ibc_metas||DEFAULT_IBC}
+function getRegistros(nombre){return getAliadoData(nombre).registros}
+function persist(){try{localStorage.setItem('eg_v4',JSON.stringify(store))}catch(e){}}
+
+function gc(id){return todayC[id]||0}
+function sc(p){return p>=100?'#0f9e70':p>=80?'#3aaa8c':p>=50?'#f59e0b':'#ef4444'}
+
+function weekDates(){
+  const d=new Date(today),day=d.getDay();
+  const diff=d.getDate()-day+(day===0?-6:1);
+  const mon=new Date(d); mon.setDate(d.getDate()-day+(day===0?-6:1));
+  return Array.from({length:7},(_,i)=>{const dd=new Date(mon);dd.setDate(mon.getDate()+i);return dd.toISOString().split('T')[0]});
+}
+function monthDates(){
+  const y=today.getFullYear(),m=today.getMonth();
+  const days=new Date(y,m+1,0).getDate();
+  return Array.from({length:days},(_,i)=>`${y}-${String(m+1).padStart(2,'0')}-${String(i+1).padStart(2,'0')}`);
+}
+function wTotal(id,nombre){
+  const reg=getRegistros(nombre);
+  return weekDates().reduce((s,d)=>s+(reg[d]&&reg[d].counts?reg[d].counts[id]||0:0),0)+(nombre===currentAliado?todayC[id]||0:0);
+}
+function mTotal(id,nombre){
+  const reg=getRegistros(nombre);
+  return monthDates().reduce((s,d)=>s+(reg[d]&&reg[d].counts?reg[d].counts[id]||0:0),0)+(nombre===currentAliado?todayC[id]||0:0);
+}
+function dTotal(id){return todayC[id]||0}
+function allActs(){return Object.values(todayC).reduce((a,b)=>a+b,0)}
+
+function avgPct(periodo, nombre){
+  const metas=getMetas(nombre||currentAliado);
+  return Math.round(ACTS.reduce((s,a)=>{
+    const m=metas[a.id]||{};
+    const mv=periodo==='mes'?m.mes:periodo==='sem'?m.sem:m.dia;
+    if(!mv) return s;
+    const v=periodo==='mes'?mTotal(a.id,nombre||currentAliado):periodo==='sem'?wTotal(a.id,nombre||currentAliado):dTotal(a.id);
+    return s+Math.min(100,Math.round(v/mv*100));
+  },0)/ACTS.filter(a=>{const m=metas[a.id]||{};return (periodo==='mes'?m.mes:periodo==='sem'?m.sem:m.dia)>0}).length);
+}
+
+// NAVIGATION
+function goLogin(){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-login').classList.add('active')}
+function enterCoach(){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-coach').classList.add('active');
+  renderCoach();
+}
+function enterAliado(){
+  // For demo: pick first aliado
+  currentAliado=ALIADOS_LISTA[0];
+  const reg=getRegistros(currentAliado);
+  todayC=reg[TK]?{...reg[TK].counts}:{};
+  ibcVal=reg[TK]?reg[TK].ibc||0:0;
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-aliado').classList.add('active');
+  initAliado();
+}
+
+// COACH
+function renderCoach(){
+  const chips=document.getElementById('aliado-chips');
+  chips.innerHTML=ALIADOS_LISTA.map(n=>`<div class="achip${n===coachAliado?' sel':''}" onclick="selectCoachAliado('${n}')">${n.split(' ')[0]}</div>`).join('');
+  renderMetaForm();
+}
+function selectCoachAliado(nombre){coachAliado=nombre;renderCoach()}
+function setPlanTab(t){
+  planTab=t;
+  document.querySelectorAll('.ptab').forEach((el,i)=>el.classList.toggle('on',['mes','sem','dia'][i]===t));
+  const hdrs={mes:'Meta / mes',sem:'Meta / semana',dia:'Meta / día'};
+  document.getElementById('col-hdr-val').textContent=hdrs[t];
+  renderMetaForm();
+}
+function renderMetaForm(){
+  document.getElementById('mf-name').textContent=coachAliado;
+  const metas=getMetas(coachAliado);
+  const ibcM=getIbcMetas(coachAliado);
+  document.getElementById('meta-rows').innerHTML=ACTS.map(a=>{
+    const val=metas[a.id]?metas[a.id][planTab]:0;
+    return`<div style="display:grid;grid-template-columns:1fr 80px;gap:6px;align-items:center;padding:5px 0;border-bottom:.5px solid #f8fafc">
+      <div style="font-size:11px;color:var(--navy);font-weight:500;line-height:1.3">${a.label}</div>
+      <input class="mr-input" type="number" min="0" value="${val||0}" data-id="${a.id}" onchange="updateMetaField('${a.id}',this.value)"/>
+    </div>`;
+  }).join('')+
+  `<div style="display:grid;grid-template-columns:1fr 80px;gap:6px;align-items:center;padding:8px 0 0;border-top:.5px solid #e2e8f0;margin-top:4px">
+    <div style="font-size:11px;color:var(--navy);font-weight:500">💰 IBC (comisiones)</div>
+    <input class="mr-input" type="number" min="0" value="${planTab==='mes'?ibcM.mes:planTab==='sem'?ibcM.sem:ibcM.dia}" data-id="ibc" onchange="updateIBCField(this.value)"/>
+  </div>`;
+}
+function updateMetaField(id,val){
+  if(!store[coachAliado]) getAliadoData(coachAliado);
+  if(!store[coachAliado].metas[id]) store[coachAliado].metas[id]={mes:0,sem:0,dia:0};
+  store[coachAliado].metas[id][planTab]=parseFloat(val)||0;
+}
+function updateIBCField(val){
+  if(!store[coachAliado]) getAliadoData(coachAliado);
+  if(!store[coachAliado].ibc_metas) store[coachAliado].ibc_metas={...DEFAULT_IBC};
+  store[coachAliado].ibc_metas[planTab]=parseFloat(val)||0;
+}
+function saveMetas(){
+  persist();
+  const btn=document.getElementById('save-metas-btn');
+  btn.classList.add('ok');btn.innerHTML='<i class="ti ti-check"></i> ¡Metas guardadas!';
+  showToast(`Metas de ${coachAliado} guardadas ✓`);
+  setTimeout(()=>{btn.classList.remove('ok');btn.innerHTML='<i class="ti ti-device-floppy"></i> Guardar metas del aliado'},2000);
+}
+
+// ALIADO
+function initAliado(){
+  const d=today;
+  document.getElementById('hh-date').textContent=DAYS_ES[d.getDay()]+' '+d.getDate()+' de '+MONTHS_ES[d.getMonth()]+' '+d.getFullYear();
+  if(document.getElementById('ibc-input')) document.getElementById('ibc-input').value=ibcVal||'';
+  renderActList();
+  updatePlanStrip();
+  renderIbcMetas();
+}
+function updatePlanStrip(){
+  const p3=avgPct('mes');const p12=avgPct('sem');
+  const metas=getMetas(currentAliado);
+  const dActs=ACTS.filter(a=>metas[a.id]&&metas[a.id].dia>0);
+  const p90=dActs.length?Math.round(dActs.reduce((s,a)=>s+Math.min(100,Math.round(dTotal(a.id)/metas[a.id].dia*100)),0)/dActs.length):0;
+  document.getElementById('ps-3m').textContent=p3+'%';
+  document.getElementById('ps-12s').textContent=p12+'%';
+  document.getElementById('ps-90d').textContent=p90+'%';
+  document.getElementById('hh-mes').textContent=p3+'%';
+  document.getElementById('hh-sem').textContent=p12+'%';
+  document.getElementById('hh-hoy').textContent=p90+'%';
+}
+function renderIbcMetas(){
+  const ibcM=getIbcMetas(currentAliado);
+  const fmt=v=>new Intl.NumberFormat('es-CO',{maximumFractionDigits:0}).format(v);
+  document.getElementById('ibc-metas').innerHTML=`
+    <div class="ibc-m"><div class="ibc-mv">$${fmt(ibcM.dia)}</div>hoy</div>
+    <div class="ibc-m"><div class="ibc-mv">$${fmt(ibcM.sem)}</div>semana</div>
+    <div class="ibc-m"><div class="ibc-mv">$${fmt(ibcM.mes)}</div>mes</div>`;
+}
+function renderActList(){
+  const metas=getMetas(currentAliado);
+  document.getElementById('act-list').innerHTML=ACTS.map(a=>{
+    const c=gc(a.id);
+    const md=metas[a.id]?metas[a.id].dia:0;
+    const ms=metas[a.id]?metas[a.id].sem:0;
+    const wt=wTotal(a.id,currentAliado);
+    const pctD=md>0?Math.min(100,Math.round(c/md*100)):0;
+    const pctS=ms>0?Math.min(100,Math.round(wt/ms*100)):0;
+    const isDone=md>0&&c>=md;
+    return`<div class="arow${isDone?' done-today':''}">
+      <div class="aicon" style="background:${a.bg}"><i class="ti ${a.icon}" style="color:${a.ic};font-size:19px"></i></div>
+      <div class="ainfo">
+        <div class="aname">${a.label}${isDone?' ✅':''}</div>
+        <div class="ameta-line">
+          ${md>0?`<span class="ameta-chip hoy-chip">Hoy: ${c}/${md}</span>`:''}
+          ${ms>0?`<span class="ameta-chip sem-chip">Sem: ${wt}/${ms}</span>`:''}
+        </div>
+        <div class="amini"><div class="amini-f" style="width:${ms>0?pctS:pctD}%;background:${sc(ms>0?pctS:pctD)}"></div></div>
+      </div>
+      <div class="ctr">
+        <button class="bm" onclick="ch('${a.id}',-1)">−</button>
+        <span class="cv" id="c-${a.id}">${c}</span>
+        <button class="bp" onclick="ch('${a.id}',1)">+</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function ch(id,delta){
+  const metas=getMetas(currentAliado);
+  const prev=todayC[id]||0;
+  todayC[id]=Math.max(0,prev+delta);
+  document.getElementById('c-'+id).textContent=todayC[id];
+  // check celebration
+  const md=metas[id]?metas[id].dia:0;
+  if(md>0&&prev<md&&todayC[id]>=md){
+    const a=ACTS.find(x=>x.id===id);
+    celebrate(`¡Meta diaria cumplida!`,`${a.label}: ${todayC[id]}/${md} ✨`);
+  }
+  renderActList();
+  updatePlanStrip();
+}
+function updateIBC(){ibcVal=parseFloat(document.getElementById('ibc-input').value)||0}
+function saveDay(){
+  const reg=getRegistros(currentAliado);
+  reg[TK]={counts:{...todayC},ibc:ibcVal,saved:true,ts:Date.now()};
+  persist();
+  const btn=document.getElementById('save-btn');
+  btn.classList.add('ok');btn.innerHTML='<i class="ti ti-check"></i> ¡Día guardado!';
+  showToast('¡Excelente! Tu día quedó registrado 🏆');
+  setTimeout(()=>{btn.classList.remove('ok');btn.innerHTML='<i class="ti ti-device-floppy"></i> Guardar mi día'},2200);
+}
+function renderMetasView(){
+  const metas=getMetas(currentAliado);
+  document.getElementById('metas-view').innerHTML=ACTS.map(a=>{
+    const mm=metas[a.id]||{mes:0,sem:0,dia:0};
+    const vm=mTotal(a.id,currentAliado),vs=wTotal(a.id,currentAliado),vd=dTotal(a.id);
+    const pm=mm.mes>0?Math.min(100,Math.round(vm/mm.mes*100)):0;
+    const ps=mm.sem>0?Math.min(100,Math.round(vs/mm.sem*100)):0;
+    const pd=mm.dia>0?Math.min(100,Math.round(vd/mm.dia*100)):0;
+    const best=Math.max(pm,ps,pd);
+    return`<div class="mv-card">
+      <div class="mv-head">
+        <div class="mv-name"><i class="ti ${a.icon}" style="color:${a.ic};font-size:16px"></i>${a.label}</div>
+        <div class="mv-pct" style="color:${sc(pm)}">${pm}%</div>
+      </div>
+      <div class="mv-periods">
+        <div class="mv-p" style="background:#fef9f0">
+          <div class="mv-pv" style="color:#92400e">${vd}<span style="font-size:10px;color:#94a3b8">/${mm.dia||'—'}</span></div>
+          <div class="mv-pl" style="color:#92400e">☀️ Hoy</div>
+        </div>
+        <div class="mv-p" style="background:#e4edf8">
+          <div class="mv-pv" style="color:#1a2a5e">${vs}<span style="font-size:10px;color:#94a3b8">/${mm.sem||'—'}</span></div>
+          <div class="mv-pl" style="color:#1a2a5e">📆 Semana</div>
+        </div>
+        <div class="mv-p" style="background:#e8f5d9">
+          <div class="mv-pv" style="color:#3d7a0e">${vm}<span style="font-size:10px;color:#94a3b8">/${mm.mes||'—'}</span></div>
+          <div class="mv-pl" style="color:#3d7a0e">📅 Mes</div>
+        </div>
+      </div>
+      <div class="mv-track"><div class="mv-fill" style="width:${pm}%;background:${sc(pm)}"></div></div>
+    </div>`;
+  }).join('');
+}
+function renderSemana(){
+  const wd=weekDates();let active=0;
+  const reg=getRegistros(currentAliado);
+  document.getElementById('drow').innerHTML=wd.map((d,i)=>{
+    const isT=d===TK,has=reg[d]&&reg[d].saved;
+    if(isT||has)active++;
+    return`<div class="dd"><div class="dd-top${isT?' dt':has?' dn':''}"></div><div class="dd-lbl">${DAYS_ES[i]}</div></div>`;
+  }).join('');
+  const metas=getMetas(currentAliado);
+  let wTot=0,wGoal=0;
+  ACTS.forEach(a=>{wTot+=wTotal(a.id,currentAliado);wGoal+=metas[a.id]?metas[a.id].sem:0});
+  const wp=wGoal>0?Math.min(100,Math.round(wTot/wGoal*100)):0;
+  document.getElementById('s-days').textContent=active;
+  document.getElementById('s-pct').textContent=wp+'%';
+  document.getElementById('s-pts').textContent=wTot;
+  document.getElementById('wk-groups').innerHTML=GROUPS.map(g=>{
+    const rows=g.acts.map(aid=>{
+      const a=ACTS.find(x=>x.id===aid),wt=wTotal(aid,currentAliado);
+      const ms=metas[aid]?metas[aid].sem:0;
+      const p=ms>0?Math.min(100,Math.round(wt/ms*100)):0;
+      return`<div class="wkrow">
+        <div class="wklbl">${a.label}</div>
+        <div class="wkbar"><div style="height:100%;border-radius:2px;background:${sc(p)};width:${p}%"></div></div>
+        <div class="wkval">${wt}/${ms||'—'}</div>
+      </div>`;
+    }).join('');
+    const gActs=g.acts.map(aid=>{const a=ACTS.find(x=>x.id===aid);const ms=metas[aid]?metas[aid].sem:0;return ms>0?Math.min(100,Math.round(wTotal(aid,currentAliado)/ms*100)):0}).filter(p=>p>=0);
+    const avg=gActs.length?Math.round(gActs.reduce((s,v)=>s+v,0)/gActs.length):0;
+    return`<div class="wkcard">
+      <div class="wkh"><span class="wko"><i class="ti ${g.icon}" style="font-size:13px;margin-right:5px"></i>${g.label}</span><span style="font-size:12px;font-weight:500;color:${sc(avg)}">${avg}%</span></div>
+      <div>${rows}</div>
+    </div>`;
+  }).join('');
+}
+function celebrate(title,sub){
+  document.getElementById('cel-title').textContent=title;
+  document.getElementById('cel-sub').textContent=sub;
+  document.getElementById('celebration').classList.add('show');
+}
+function closeCel(){document.getElementById('celebration').classList.remove('show')}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800)}
+function showTab(tab){
+  ['hoy','metas','semana'].forEach(t=>{
+    document.getElementById('tc-'+t).classList.toggle('hidden',t!==tab);
+    document.getElementById('tab-'+t).classList.toggle('active',t===tab);
+  });
+  if(tab==='metas')renderMetasView();
+  if(tab==='semana')renderSemana();
+}
+</script>
+</body>
+</html>
